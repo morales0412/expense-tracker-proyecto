@@ -1,0 +1,21 @@
+{% extends 'base.html'%}
+
+{% block title%} Listar Categorias {%endblock%}
+
+{% block content%}
+    <h2> Listar de categorias </h2>
+
+    <a href = "{% url 'crear_categoria' %}"> Crear nueva categoria </a>
+
+    <ul>
+        {% for categoria in categorias%}
+            <li>
+                {{ categoria.nombre}} - {{ categoria.descripcion}}
+                <a href= "{% url 'editar_categoria' categoria.id %}"> Editar </a>
+                <a href= "{%url 'eliminar_categoria' categoria.id%}"> Eliminar </a>
+            </li>
+        {%empty%}
+            <li> No hay categorias disponibles. </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

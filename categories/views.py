@@ -19,6 +19,8 @@ def crear_categoria(request):
         form = CategoriaForm(request.POST)
         if form.is_valid():
             form.save()
+            print(request.POST["nombre"])
+            print(form.data)
             messages.success(request, "Categoria creada exitosamente.")
             return redirect("listar_categorias")
         else:
@@ -27,7 +29,7 @@ def crear_categoria(request):
             )
     else:
         form = CategoriaForm()
-    return render(request, "categories/crear_categoria.html", {"form": form})
+    return render(request, "categories/crear_categorias.html", {"form": form})
 
 
 def editar_categoria(request, categoria_id):
@@ -41,7 +43,7 @@ def editar_categoria(request, categoria_id):
         else:
             messages.error(
                 request, "Error al editar la categoria"
-            )  # Muestra que no es valid y luego renderiza el formulario con los valores que tenia en la request
+            )  # Muestra que no es valido y luego renderiza el formulario con los valores que tenia en la request
     else:
         # se hace cuando se entra a la url y hace un GET
         form = CategoriaForm(
@@ -49,7 +51,7 @@ def editar_categoria(request, categoria_id):
         )  # crea un formulario prellenado con los datos de la categoria a editar
     return render(
         request, "categories/editar_categoria.html", {"form": form}
-    )  # Esto se ejecuta cuando se hace una solicitud GET para mostrar el formulario de edición con los datos actuales de la categoria
+    )  # Esto se ejecuta cuando se hace una solicitud GET para mostrar el formulario de edición con los datos actuales de la categoria o cuando los datos enviados en una solicitud POST no son validos y se quiere mostrar el formulario nuevamente con los errores y los datos ingresados por el usuario.
 
 
 def eliminar_categoria(request, categoria_id):
