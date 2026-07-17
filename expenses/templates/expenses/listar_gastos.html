@@ -1,0 +1,22 @@
+{%extends 'base.html'%}
+
+{% block title%} Listar Gastos {%endblock%}
+
+{% block content%}
+
+<h1> Lista de gastos </h1>
+<a href = "{% url 'crear_gasto' %}"> Crear nuevo gasto </a>
+
+<ul>
+    {%for gasto in gastos%}
+        <li>
+            {{ gasto.nombre}} - {{ gasto.descripcion}} - {{ gasto.monto}} - {{ gasto.fecha}} - {{ gasto.categoria}}
+            <a href = "{% url 'editar_gasto' gasto.id %}"> Editar gasto </a>
+            <a href = "{% url 'eliminar_gasto' gasto.id%}"> Eliminar gasto </a>
+        </li>
+    {%empty%}
+        <li> No hay gastos disponibles. </li>
+    {%endfor%}
+</ul>
+
+{%endblock%}

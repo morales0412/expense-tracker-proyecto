@@ -5,7 +5,8 @@ from .models import Expense
 class ExpenseForm(forms.ModelForm):
     class Meta:
         model = Expense
-        fields = ["nombre", "monto", "categoria", "fecha"]
+        fields = ["nombre", "monto", "categoria", "fecha", "descripcion"]
+        widgets = {"fecha": forms.DateInput(attrs={"type": "date"})}
         labels = {
             "nombre": "Nombre del gasto",
             "monto": "Monto del gasto",
@@ -25,5 +26,8 @@ class ExpenseForm(forms.ModelForm):
             },
             "monto": {"required": "El monto del gasto es obligatorio."},
             "categoria": {"required": "La categoria del gasto es obligatoria."},
-            "fecha": {"required": "La fecha del gasto es obligatoria."},
+            "fecha": {
+                "required": "La fecha del gasto es obligatoria.",
+                "invalid": "Ingrese una fecha valida.",
+            },
         }
