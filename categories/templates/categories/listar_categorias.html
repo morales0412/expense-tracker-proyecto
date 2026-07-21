@@ -5,14 +5,18 @@
 {% block content%}
     <h2> Listar de categorias </h2>
 
-    <a href = "{% url 'crear_categoria' %}"> Crear nueva categoria </a>
+    <a href = "{% url 'crear_categoria' %}" class="btn-primary"> Crear nueva categoria </a>
 
+    <form method= "GET">
+        <input type = "text" name = "busqueda" value = "{{ busqueda }}" placeholder = "Buscar por nombre">
+        <button type = "submit" class="btn-primary"> Buscar </button>
+    </form>
     <ul>
         {% for categoria in categorias%}
             <li>
                 {{ categoria.nombre}} - {{ categoria.descripcion}}
-                <a href= "{% url 'editar_categoria' categoria.id %}"> Editar </a>
-                <a href= "{%url 'eliminar_categoria' categoria.id%}"> Eliminar </a>
+                <a href= "{% url 'editar_categoria' categoria.id %}" class="btn-secondary"> Editar </a>
+                <a href= "{%url 'eliminar_categoria' categoria.id%}" class="btn-danger"> Eliminar </a>
             </li>
         {%empty%}
             <li> No hay categorias disponibles. </li>

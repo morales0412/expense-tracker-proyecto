@@ -2,18 +2,27 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Expense
 from .forms import ExpenseForm
 from django.contrib import messages
+from django.db.models import Q, Sum, Count
 # Create your views here.
 
 
 def listar_gastos(request):
     gastos = Expense.objects.all()
-    return render(request, "expenses/listar_gastos.html", {"gastos": gastos})
+    busqueda = request.GET.get("busqueda", "")
+    if busqueda:
+        gastos = gastos.filter(
+            Q(nombre__icontains=busqueda) | Q(categoria__nombre__icontains=busqueda)
+        )
+    return render(
+        request, "expenses/listar_gastos.html", {"gastos": gastos, "busqueda": busqueda}
+    )
 
 
 def crear_gasto(request):
     if request.method == "POST":
         form = ExpenseForm(request.POST)
         if form.is_valid():
+            print(request.POST.get("fecha"))
             form.save()
             messages.success(request, "Gasto creado con exito")
             return redirect("listar_gastos")
@@ -50,3 +59,7 @@ def eliminar_gasto(request, gasto_id):
         messages.success(request, "Gasto eliminado con exito")
         return redirect("listar_gastos")
     return render(request, "expenses/eliminar_gasto.html", {"gasto": gasto})
+
+
+def dashboard(request):
+    pass

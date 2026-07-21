@@ -7,10 +7,13 @@ from .forms import CategoriaForm
 
 def listar_categorias(request):
     categorias = Category.objects.all()
+    busqueda = request.GET.get("busqueda", "")
+    if busqueda:
+        categorias = categorias.filter(nombre__icontains=busqueda)
     return render(
         request,
         "categories/listar_categorias.html",
-        {"categorias": categorias},
+        {"categorias": categorias, "busqueda": busqueda},
     )
 
 
