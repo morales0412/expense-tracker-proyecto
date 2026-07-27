@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title%} Dashboard {% endblock %}
+
+{% block content %}
+    <h1> Dashboard </h1>
+    <h2> total de gastos: {{ total}} </h2>
+    <h2> cantidad de gastos: {{ cantidad_gastos}} </h2>
+    <h2> Gastos por categoria: </h2>
+    <ul>
+        {% for categoria in gastos_por_categoria%}
+            <li> {{ categoria.nombre}} : {{ categoria.total_gastos}} ({{ categoria.cantidad }} gastos) </li>
+        {% empty %}
+            <li> No hay gastos por categoria. </li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}
