@@ -4,19 +4,22 @@ from django.contrib import messages
 from .forms import CategoriaForm
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 # Create your views here.
 
 
-class ListarCategoriasView(ListView):
+class ListarCategoriasView(LoginRequiredMixin, ListView):
     model = Category
     template_name = "categories/listar_categorias.html"
     context_object_name = "categorias"
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().filter(usuario=self.request.user)
         busqueda = self.request.GET.get("busqueda", "")
         if busqueda:
-            queryset = queryset.filter(nombre__icontains=busqueda)
+            queryset = queryset.filter(
+                nombre__icontains=busqueda, usuario=self.request.user
+            )
         return queryset
 
 
@@ -32,11 +35,15 @@ class ListarCategoriasView(ListView):
 #     )
 
 
-class CrearCategoriaView(CreateView):
+class CrearCategoriaView(LoginRequiredMixin, CreateView):
     model = Category
     template_name = "categories/crear_categorias.html"
     form_class = CategoriaForm
     success_url = reverse_lazy("listar_categorias")
+
+    def form_valid(self, form):
+        form.instance.usuario = self.request.user
+        return super().form_valid(form)
 
 
 # def crear_categoria(request):
@@ -57,11 +64,14 @@ class CrearCategoriaView(CreateView):
 #     return render(request, "categories/crear_categorias.html", {"form": form})
 
 
-class EditarCategoriaView(UpdateView):
+class EditarCategoriaView(LoginRequiredMixin, UpdateView):
     model = Category
     template_name = "categories/editar_categoria.html"
     form_class = CategoriaForm
     success_url = reverse_lazy("listar_categorias")
+
+    def get_queryset(self):
+        return super().get_queryset().filter(usuario=self.request.user)
 
 
 # def editar_categoria(request, categoria_id):
@@ -86,11 +96,14 @@ class EditarCategoriaView(UpdateView):
 #     )  # Esto se ejecuta cuando se hace una solicitud GET para mostrar el formulario de edición con los datos actuales de la categoria o cuando los datos enviados en una solicitud POST no son validos y se quiere mostrar el formulario nuevamente con los errores y los datos ingresados por el usuario.
 
 
-class EliminarCategoriaView(DeleteView):
+class EliminarCategoriaView(LoginRequiredMixin, DeleteView):
     model = Category
     template_name = "categories/eliminar_categoria.html"
     context_object_name = "categoria"
     success_url = reverse_lazy("listar_categorias")
+
+    def get_queryset(self):
+        return super().get_queryset().filter(usuario=self.request.user)
 
 
 # def eliminar_categoria(request, categoria_id):

@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión | Expense Tracker</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body class="auth-page">
+    <main class="auth-shell">
+        <section class="auth-brand-panel">
+            <p class="auth-kicker">Expense Tracker</p>
+            <h1>Controla tus gastos con una vista limpia y simple.</h1>
+            <p>
+                Ingresa para revisar tus categorías, registrar movimientos y ver tu dashboard
+                con el mismo estilo oscuro de toda la aplicación.
+            </p>
+        </section>
+
+        <section class="auth-card">
+            <div class="auth-header">
+                <h2>Iniciar sesión</h2>
+                <p>Accede a tu cuenta para continuar.</p>
+            </div>
+
+            <form method="POST" class="auth-form">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Entrar</button>
+            </form>
+
+            <p class="auth-switch">
+                ¿No tienes cuenta? <a href="{% url 'register' %}">Regístrate</a>
+            </p>
+        </section>
+    </main>
+</body>
+</html>

@@ -5,16 +5,18 @@ from django.contrib import messages
 from django.db.models import Q, Sum, Count
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 # Create your views here.
 
 
-class ListarGastosView(ListView):
+class ListarGastosView(LoginRequiredMixin, ListView):
     model = Expense
     template_name = "expenses/listar_gastos.html"
     context_object_name = "gastos"
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().filter(usuario=self.request.user)
         busqueda = self.request.GET.get("busqueda", "")
         if busqueda:
             queryset = queryset.filter(
@@ -37,11 +39,15 @@ class ListarGastosView(ListView):
 #     )
 
 
-class CrearGastoView(CreateView):
+class CrearGastoView(LoginRequiredMixin, CreateView):
     model = Expense
     template_name = "expenses/crear_gasto.html"
     form_class = ExpenseForm
     success_url = reverse_lazy("listar_gastos")
+
+    def form_valid(self, form):
+        form.instance.usuario = self.request.user
+        return super().form_valid(form)
 
 
 # def crear_gasto(request):
@@ -61,11 +67,14 @@ class CrearGastoView(CreateView):
 #     return render(request, "expenses/crear_gasto.html", {"form": form})
 
 
-class EditarGastoView(UpdateView):
+class EditarGastoView(LoginRequiredMixin, UpdateView):
     model = Expense
     template_name = "expenses/editar_gasto.html"
     form_class = ExpenseForm
     success_url = reverse_lazy("listar_gastos")
+
+    def get_queryset(self):
+        return super().get_queryset().filter(usuario=self.request.user)
 
 
 # def editar_gasto(request, gasto_id):
@@ -85,11 +94,14 @@ class EditarGastoView(UpdateView):
 #     return render(request, "expenses/editar_gasto.html", {"form": form})
 
 
-class EliminarGastoView(DeleteView):
+class EliminarGastoView(LoginRequiredMixin, DeleteView):
     model = Expense
     template_name = "expenses/eliminar_gasto.html"
     success_url = reverse_lazy("listar_gastos")
     context_object_name = "gasto"
+
+    def get_queryset(self):
+        return super().get_queryset().filter(usuario=self.request.user)
 
 
 # def eliminar_gasto(request, gasto_id):
@@ -101,13 +113,19 @@ class EliminarGastoView(DeleteView):
 #     return render(request, "expenses/eliminar_gasto.html", {"gasto": gasto})
 
 
+@login_required
 def dashboard(request):
-    total = Expense.objects.aggregate(monto_total=Sum("monto"))["monto_total"] or 0
-    print(total)
-    cantidad_gastos = Expense.objects.count()
-    gastos_por_categoria = Category.objects.annotate(
-        total_gastos=Sum("expense__monto"), cantidad=Count("expense")
+    total = (
+        Expense.objects.filter(usuario=request.user).aggregate(
+            monto_total=Sum("monto")
+        )["monto_total"]
+        or 0
     )
+    cantidad_gastos = Expense.objects.filter(usuario=request.user).count()
+    print(request.user)
+    gastos_por_categoria = Category.objects.filter(
+        expense__usuario=request.user
+    ).annotate(total_gastos=Sum("expense__monto"), cantidad=Count("expense"))
     print(gastos_por_categoria)
     return render(
         request,
